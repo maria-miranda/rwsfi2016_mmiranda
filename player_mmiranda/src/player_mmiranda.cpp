@@ -60,7 +60,7 @@ class MyPlayer: public rwsfi2016_libs::Player
                     int i_min;
         int i_min1 = 0, i_min2 = 0, h_min = 0;
 
-        if(msg.red_alive.size() >= 1 ){
+        if(find(msg.red_alive.begin(), msg.red_alive.end(), msg.red_alive[0]) != msg.red_alive.end()){
             dist_min1 = getDistanceToPlayer(msg.red_alive[0]);
             i_min = 0;
         }
