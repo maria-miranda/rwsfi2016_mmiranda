@@ -4,6 +4,7 @@
    |_________________________________| */
 #include <ros/ros.h>
 #include <rwsfi2016_libs/player.h>
+#include <rwsfi2016_msgs/GameQuery.h>
 #include <math.h>
 #include <std_msgs/String.h>
 #include <visualization_msgs/Marker.h>
@@ -25,6 +26,7 @@ class MyPlayer: public rwsfi2016_libs::Player
 
     ros::Publisher publisher;
     visualization_msgs::Marker bocas_msg;
+    ros::ServiceServer service;
 
     /**
      * @brief Constructor, nothing to be done here
@@ -45,6 +47,8 @@ class MyPlayer: public rwsfi2016_libs::Player
         bocas_msg.color.r = 0.0;
         bocas_msg.color.g = 0.0;
         bocas_msg.color.b = 0.0;
+
+        service = node.advertiseService("mmiranda/game_query", &MyPlayer::queryCallback, this);
     };
 
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
@@ -87,10 +91,10 @@ class MyPlayer: public rwsfi2016_libs::Player
 
         double angleMove;
         double distance_to_arena = getDistanceToArena();
-        if (distance_to_arena > 6) //behaviour move to the center of arena
+        if (distance_to_arena > 7.5) //behaviour move to the center of arena
         {
             string arena = "/map";
-            move(msg.max_displacement, getAngleToPLayer(arena));
+            move(msg.max_displacement/2.0, getAngleToPLayer(arena));
             bocas_msg.text = "Going to center";
         }
         else{
@@ -112,6 +116,11 @@ class MyPlayer: public rwsfi2016_libs::Player
       //move(msg.max_displacement, M_PI);
 
         publisher.publish(bocas_msg);
+    }
+
+    bool queryCallback(rwsfi2016_msgs::GameQuery::Request &req, rwsfi2016_msgs::GameQuery::Response &res){
+        res.resposta = "Hello World";
+        return true;
     }
 };
 
