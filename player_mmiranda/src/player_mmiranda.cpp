@@ -31,21 +31,25 @@ class MyPlayer: public rwsfi2016_libs::Player
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
     {
       //Custom play behaviour. Now I will win the game
-        double dist, dist_min=999, dist_hmin=999;
+        double dist_min=999, dist_hmin=999;
         int i_min = 0, h_min = 0;
         for(int i = 0; i < msg.red_alive.size(); i++){
-            dist = getDistanceToPlayer(msg.red_alive[i]);
-            if(dist <= dist_min){
-                dist_min = dist;
-                i_min = i;
+            double dist = getDistanceToPlayer(msg.red_alive[i]);
+            if(dist == dist){
+                if(dist <= dist_min){
+                    dist_min = dist;
+                    i_min = i;
+                }
             }
         }
 
         for(int i=0; i< msg.green_alive.size(); i++){
             double dist_h = getDistanceToPlayer(msg.green_alive[i]);
-            if(dist_h <= dist_hmin){
-                dist_hmin = dist_h;
-                h_min = i;
+            if(dist_h == dist_h){
+                if(dist_h <= dist_hmin){
+                    dist_hmin = dist_h;
+                    h_min = i;
+                }
             }
         }
 
