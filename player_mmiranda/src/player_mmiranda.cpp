@@ -57,11 +57,12 @@ class MyPlayer: public rwsfi2016_libs::Player
         bocas_msg.header.stamp = ros::Time();
 
         double dist_min1=999, dist_min2=999, dist_hmin=999;
+                    int i_min;
         int i_min1 = 0, i_min2 = 0, h_min = 0;
 
         if(msg.red_alive.size() >= 1 ){
             dist_min1 = getDistanceToPlayer(msg.red_alive[0]);
-            i_min1 = 0;
+            i_min = 0;
         }
         else{
 
@@ -78,7 +79,7 @@ class MyPlayer: public rwsfi2016_libs::Player
                 }
             }
 
-            int i_min;
+
             if(getAngleToPLayer(msg.red_alive[i_min2]) < getAngleToPLayer(msg.red_alive[i_min1]))
                 i_min = i_min2;
             else
