@@ -40,6 +40,7 @@ class MyPlayer: public rwsfi2016_libs::Player
                 i_min = i;
             }
         }
+        
 
         if(dist_min > msg.max_displacement)
             dist_min = msg.max_displacement;
