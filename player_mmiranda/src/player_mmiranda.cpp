@@ -65,21 +65,26 @@ class MyPlayer: public rwsfi2016_libs::Player
         }
 
         double angleMove;
-      //Behaviour follow the closest prey
-        if(dist_hmin <= dist_min1)
-            angleMove = M_PI - getAngleToPLayer(msg.green_alive[h_min]);
-        else
-            angleMove = getAngleToPLayer(msg.red_alive[i_min]);
-
         double distance_to_arena = getDistanceToArena();
         if (distance_to_arena > 6) //behaviour move to the center of arena
         {
             string arena = "/map";
             move(msg.max_displacement, getAngleToPLayer(arena));
         }
+        else{
 
 
-      move(msg.max_displacement, angleMove);
+          //Behaviour follow the closest prey
+            if(dist_hmin <= dist_min1){
+                angleMove = - getAngleToPLayer(msg.green_alive[h_min]);
+                move(msg.max_displacement, angleMove);
+            }
+            else{
+                angleMove = getAngleToPLayer(msg.red_alive[i_min]);
+                move(msg.max_displacement, angleMove);
+            }
+        }
+
       //move(msg.max_displacement, M_PI);
 
 
