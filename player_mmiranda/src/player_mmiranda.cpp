@@ -59,24 +59,32 @@ class MyPlayer: public rwsfi2016_libs::Player
         double dist_min1=999, dist_min2=999, dist_hmin=999;
         int i_min1 = 0, i_min2 = 0, h_min = 0;
 
-        for(int i = 0; i < msg.red_alive.size(); i++){
-            double dist = getDistanceToPlayer(msg.red_alive[i]);
-            if(dist == dist){
-                if(dist <= dist_min1){
-                    double aux = dist_min1;
-                    dist_min1 = dist;
-                    dist_min2 = aux;
-                    i_min1 = i;
-                    i_min2 = i_min1;
+        if(msg.red_alive.size() >= 1 ){
+            dist_min1 = getDistanceToPlayer(msg.red_alive[0]);
+            i_min1 = 0;
+        }
+        else{
+
+            for(int i = 0; i < msg.red_alive.size(); i++){
+                double dist = getDistanceToPlayer(msg.red_alive[i]);
+                if(dist == dist){
+                    if(dist <= dist_min1){
+                        double aux = dist_min1;
+                        dist_min1 = dist;
+                        dist_min2 = aux;
+                        i_min1 = i;
+                        i_min2 = i_min1;
+                    }
                 }
             }
+
+            int i_min;
+            if(getAngleToPLayer(msg.red_alive[i_min2]) < getAngleToPLayer(msg.red_alive[i_min1]))
+                i_min = i_min2;
+            else
+                 i_min = i_min1;
         }
 
-        int i_min;
-        if(getAngleToPLayer(msg.red_alive[i_min2]) < getAngleToPLayer(msg.red_alive[i_min1]))
-            i_min = i_min2;
-        else
-             i_min = i_min1;
 
 
         for(int i=0; i< msg.green_alive.size(); i++){
