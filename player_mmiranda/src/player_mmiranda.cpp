@@ -94,14 +94,14 @@ class MyPlayer: public rwsfi2016_libs::Player
         if (distance_to_arena > 7.5) //behaviour move to the center of arena
         {
             string arena = "/map";
-            move(msg.max_displacement/2.0, getAngleToPLayer(arena));
+            move(msg.max_displacement/2.0, getAngleToPLayer(arena)/2);
             bocas_msg.text = "Going to center";
         }
         else{
 
 
           //Behaviour follow the closest prey
-            if(dist_hmin <= dist_min1){
+            if(dist_hmin <= dist_min1 && dist_hmin <= 3){
                 angleMove = - getAngleToPLayer(msg.green_alive[h_min]);
                 move(msg.max_displacement, angleMove);
                 bocas_msg.text = "Running";
