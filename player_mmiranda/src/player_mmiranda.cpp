@@ -43,7 +43,7 @@ class MyPlayer: public rwsfi2016_libs::Player
 
         publisher = node.advertise<visualization_msgs::Marker>("/bocas", 1);
 
-        subscriber = node.subscribe("/object_point_could", 1, &MyPlayer::pointcloudCallback, this);
+        subscriber = node.subscribe("/object_point_cloud", 1, &MyPlayer::pointcloudCallback, this);
 
 
         bocas_msg.header.frame_id = name;
@@ -58,8 +58,14 @@ class MyPlayer: public rwsfi2016_libs::Player
         bocas_msg.color.g = 0.0;
         bocas_msg.color.b = 0.0;
 
-        service = node.advertiseService("mmiranda/game_query", &MyPlayer::queryCallback, this);
+        service = node.advertiseService("/mmiranda/game_query", &MyPlayer::queryCallback, this);
     };
+
+    void pointcloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg){
+       pcl::fromROSMsg(*msg, pointcloud);
+
+       //std::cout << "###############PCL################" << pointcloud.points.size() << std::endl;
+    }
 
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
     {
@@ -137,20 +143,34 @@ class MyPlayer: public rwsfi2016_libs::Player
         publisher.publish(bocas_msg);
     }
 
-    void pointcloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg){
-       pcl::fromROSMsg(*msg, pointcloud);
-    }
 
     bool queryCallback(rwsfi2016_msgs::GameQuery::Request &req, rwsfi2016_msgs::GameQuery::Response &res){
 
-        if(pointcloud.points.size() == 3979)
-            res.resposta = "banana";
-        if(pointcloud.points.size() == 3468)
-            res.resposta = "onion";
-        if(pointcloud.points.size() == 3805)
+
+        float R=0, G=0, B=0;
+
+        for(int i=0; i <pointcloud.points.size(); i++){
+            R += pointcloud.points[i].r;
+            G += pointcloud.points[i].g;
+            B += pointcloud.points[i].b;
+        }
+
+        R /= pointcloud.points.size();
+        G /= pointcloud.points.size();
+        B /= pointcloud.points.size();
+
+
+    std::cout << "R G B: " << R << " " << G << " " << B << std::endl;
+
+        if(R > 59 && G >63 && B>88)
             res.resposta = "soda_can";
-        if(pointcloud.points.size() == 1570)
+        else if(R > 61 && G >35 && B>47)
+            res.resposta = "onion";
+        else if(R > 150 && G >141 && B>44)
+            res.resposta = "banana";
+        else
             res.resposta = "tomato";
+
         return true;
     }
 };
