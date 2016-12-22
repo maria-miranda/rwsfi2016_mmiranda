@@ -69,76 +69,93 @@ class MyPlayer: public rwsfi2016_libs::Player
 
     void play(const rwsfi2016_msgs::MakeAPlay& msg)
     {
-      //Custom play behaviour. Now I will win the game
+        //Custom play behaviour. Now I will win the game
         bocas_msg.header.stamp = ros::Time();
 
         double dist_min1=999, dist_min2=999, dist_hmin=999;
-                    int i_min;
         int i_min1 = 0, i_min2 = 0, h_min = 0;
 
-        if(find(msg.red_alive.begin(), msg.red_alive.end(), msg.red_alive[0]) != msg.red_alive.end()){
-            dist_min1 = getDistanceToPlayer(msg.red_alive[0]);
-            i_min = 0;
-        }
-        else{
-
-            for(int i = 0; i < msg.red_alive.size(); i++){
-                double dist = getDistanceToPlayer(msg.red_alive[i]);
-                if(dist == dist){
-                    if(dist <= dist_min1){
-                        double aux = dist_min1;
-                        dist_min1 = dist;
-                        dist_min2 = aux;
-                        i_min1 = i;
-                        i_min2 = i_min1;
-                    }
-                }
+        for(int i = 0; i < msg.red_alive.size(); i++){
+            double dist = getDistanceToPlayer(msg.red_alive[i]);
+            if(dist <= dist_min1){
+                dist_min1 = dist;
+                i_min1 = i;
             }
-
-
-            if(getAngleToPLayer(msg.red_alive[i_min2]) < getAngleToPLayer(msg.red_alive[i_min1]))
-                i_min = i_min2;
-            else
-                 i_min = i_min1;
         }
 
+        int i_min;
+
+        i_min = i_min1;
 
 
         for(int i=0; i< msg.green_alive.size(); i++){
             double dist_h = getDistanceToPlayer(msg.green_alive[i]);
-            if(dist_h == dist_h){
-                if(dist_h <= dist_hmin){
-                    dist_hmin = dist_h;
-                    h_min = i;
-                }
+            if(dist_h <= dist_hmin){
+                dist_hmin = dist_h;
+                h_min = i;
             }
+
         }
 
         double angleMove;
         double distance_to_arena = getDistanceToArena();
-        if (distance_to_arena > 7.5) //behaviour move to the center of arena
+
+        float green_angle = getAngleToPLayer(msg.green_alive[h_min]);
+
+
+        string arena = "/map";
+        double angle_to_arena = getAngleToPLayer(arena);
+
+        if (distance_to_arena >7.5) //behaviour move to the center of arena
         {
-            string arena = "/map";
-            move(msg.max_displacement/2.0, getAngleToPLayer(arena)/2);
-            bocas_msg.text = "Going to center";
+            move(msg.max_displacement*(7.8-distance_to_arena), angle_to_arena);
+            bocas_msg.text = "Estive ao pe do precipicio e dei um passo em frente";
         }
         else{
+            //Behaviour follow the closest prey
+            if((dist_hmin <= dist_min1) && (dist_hmin < 3.0)){
+                float tdist = 5.0;
+                if (distance_to_arena < tdist)
+                {
+                    angleMove = - green_angle;
+                    move(msg.max_displacement, angleMove);
+                }
+                else
+                {
+                    angleMove = -1*(1 - (distance_to_arena - tdist)/(8.0-tdist))* green_angle+((distance_to_arena - tdist)/(8.0-tdist))*angle_to_arena ;
+                    move(msg.max_displacement, angleMove);
+                }
 
-
-          //Behaviour follow the closest prey
-            if(dist_hmin <= dist_min1 && dist_hmin <= 3){
-                angleMove = - getAngleToPLayer(msg.green_alive[h_min]);
-                move(msg.max_displacement, angleMove);
-                bocas_msg.text = "Running";
+                bocas_msg.text = "Damn! Xau " + msg.green_alive[h_min] +" vou dar o fora!";
             }
             else{
-                angleMove = getAngleToPLayer(msg.red_alive[i_min]);
-                move(msg.max_displacement, angleMove);
-                bocas_msg.text = "Catching";
+                if(msg.red_alive.size()>=1)
+                {
+                    if(getDistanceToPlayer(msg.red_alive[i_min]) <= 0.3 * getDistanceToPlayer(msg.red_alive[0]))
+                    {
+                        angleMove = getAngleToPLayer(msg.red_alive[i_min]);
+                        bocas_msg.text = "Poe te a toques " +msg.red_alive[i_min] ;
+                    }
+                    else
+                    {
+                        angleMove = getAngleToPLayer(msg.red_alive[0]);
+                        bocas_msg.text = "Poe te a toques " +msg.red_alive[0] ;
+                    }
+
+                    move(msg.max_displacement, angleMove);
+                }
+                else
+                {
+                    angleMove = getAngleToPLayer(msg.red_alive[i_min]);
+                    move(msg.max_displacement, angleMove);
+                    bocas_msg.text = "Poe te a toques " +msg.red_alive[i_min] ;
+                }
+
+
             }
         }
 
-      //move(msg.max_displacement, M_PI);
+        //move(msg.max_displacement, M_PI);
 
         publisher.publish(bocas_msg);
     }
