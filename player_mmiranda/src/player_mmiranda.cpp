@@ -143,8 +143,14 @@ class MyPlayer: public rwsfi2016_libs::Player
 
     bool queryCallback(rwsfi2016_msgs::GameQuery::Request &req, rwsfi2016_msgs::GameQuery::Response &res){
 
-
-        res.resposta = "banana";
+        if(pointcloud.points.size() == 3979)
+            res.resposta = "banana";
+        if(pointcloud.points.size() == 3468)
+            res.resposta = "onion";
+        if(pointcloud.points.size() == 3805)
+            res.resposta = "soda_can";
+        if(pointcloud.points.size() == 1570)
+            res.resposta = "tomato";
         return true;
     }
 };
