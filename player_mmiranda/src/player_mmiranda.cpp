@@ -8,7 +8,10 @@
 #include <math.h>
 #include <std_msgs/String.h>
 #include <visualization_msgs/Marker.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
 
+typedef pcl::PointXYZRGB PointT;
 /* _________________________________
    |                                 |
    |              CODE               |
@@ -25,8 +28,11 @@ class MyPlayer: public rwsfi2016_libs::Player
   public: 
 
     ros::Publisher publisher;
+    ros::Subscriber subscriber;
     visualization_msgs::Marker bocas_msg;
     ros::ServiceServer service;
+
+    pcl::PointCloud<PointT> pointcloud;
 
     /**
      * @brief Constructor, nothing to be done here
@@ -36,6 +42,10 @@ class MyPlayer: public rwsfi2016_libs::Player
     MyPlayer(string player_name, string pet_name="/dog"): Player(player_name, pet_name){
 
         publisher = node.advertise<visualization_msgs::Marker>("/bocas", 1);
+
+        subscriber = node.subscribe("/object_point_could", 1, &MyPlayer::pointcloudCallback, this);
+
+
         bocas_msg.header.frame_id = name;
         bocas_msg.ns = name;
         bocas_msg.id = 0;
@@ -127,8 +137,14 @@ class MyPlayer: public rwsfi2016_libs::Player
         publisher.publish(bocas_msg);
     }
 
+    void pointcloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg){
+       pcl::fromROSMsg(*msg, pointcloud);
+    }
+
     bool queryCallback(rwsfi2016_msgs::GameQuery::Request &req, rwsfi2016_msgs::GameQuery::Response &res){
-        res.resposta = "Hello World";
+
+
+        res.resposta = "banana";
         return true;
     }
 };
